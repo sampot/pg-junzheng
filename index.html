@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#100d18" />
+    <meta name="description" content="三國一郡：每回合三道政令，調糧運兵，十二回合攻成都或守漢中。" />
+    <title>三國一郡</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="embers" aria-hidden="true"></div>
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">漢末 · 巴蜀戰雲</p>
+          <h1>三國一郡</h1>
+        </div>
+        <button id="sound-toggle" class="round-button" type="button" aria-pressed="true">♫ 音效開</button>
+      </header>
+
+      <section id="lobby" class="panel lobby">
+        <div class="seal" aria-hidden="true">郡</div>
+        <p class="kicker">十二回合 · 三令定乾坤</p>
+        <h2>受命鎮守漢中</h2>
+        <p class="intro">經營糧秣、徵募士卒、築城移軍。敵我命令在回合末同時揭示，一戰便定城池歸屬。</p>
+        <fieldset>
+          <legend>選擇軍令</legend>
+          <div class="mode-picker" role="radiogroup" aria-label="劇本">
+            <button class="choice selected" type="button" data-mode="siege" role="radio" aria-checked="true">
+              <span>⚔</span><strong>攻城</strong><small>十二回合內攻取成都</small>
+            </button>
+            <button class="choice" type="button" data-mode="defend" role="radio" aria-checked="false">
+              <span>盾</span><strong>守郡</strong><small>守住漢中十二回合</small>
+            </button>
+          </div>
+        </fieldset>
+        <label class="difficulty-row" for="difficulty">
+          <span><strong>敵軍謀略</strong><small>困難敵軍更敢於趁虛進攻</small></span>
+          <select id="difficulty"><option value="normal">常勢</option><option value="hard">梟雄</option></select>
+        </label>
+        <button id="start-button" class="primary big" type="button">擂鼓出陣</button>
+        <p class="best-line">歷代最高戰功 <strong id="best-value">0</strong></p>
+      </section>
+
+      <section id="game-view" class="game" hidden>
+        <div class="hud" aria-label="軍情總覽">
+          <div><span>回合</span><strong id="turn-value">1 / 12</strong></div>
+          <div><span>政令</span><strong id="actions-value">●●●</strong></div>
+          <div><span>糧</span><strong id="grain-value">72</strong></div>
+          <div><span>兵</span><strong id="soldiers-value">280</strong></div>
+          <div><span>民心</span><strong id="support-value">72</strong></div>
+        </div>
+        <section id="objective" class="objective panel"></section>
+
+        <section class="war-map panel" aria-label="七城戰略地圖">
+          <div class="map-title"><span>蜀道七城圖</span><small>點城查看軍情</small></div>
+          <svg id="roads" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+          <div id="cities" class="cities"></div>
+          <div class="map-legend"><span><i class="player-dot"></i>我軍</span><span><i class="neutral-dot"></i>中立</span><span><i class="enemy-dot"></i>敵軍</span></div>
+        </section>
+
+        <aside class="command-column">
+          <section id="city-card" class="city-card panel" aria-live="polite"></section>
+          <section class="decree-panel panel">
+            <div class="section-heading">
+              <div><p class="kicker">本回合軍議</p><h2>頒布政令</h2></div>
+              <span id="decree-count">尚餘 3 令</span>
+            </div>
+            <div id="decrees" class="decree-grid">
+              <button type="button" data-action="farm"><span>田</span><strong>屯田</strong><small>增糧與民心</small></button>
+              <button type="button" data-action="recruit"><span>募</span><strong>徵兵</strong><small>耗糧與民心</small></button>
+              <button type="button" data-action="fortify"><span>城</span><strong>築城</strong><small>提高城防</small></button>
+              <button type="button" data-action="move"><span>移</span><strong>移軍</strong><small>調往友鄰</small></button>
+              <button type="button" data-action="attack"><span>戰</span><strong>出征</strong><small>攻打鄰城</small></button>
+              <button type="button" data-action="scout"><span>察</span><strong>偵察</strong><small>探查鄰敵</small></button>
+            </div>
+            <div id="order-form" class="order-form" hidden></div>
+            <p id="order-message" class="message" role="status"></p>
+            <button id="end-turn" class="primary big" type="button">擊鼓 · 揭示軍令</button>
+          </section>
+          <section class="generals panel">
+            <div class="section-heading"><h2>帳下三將</h2></div>
+            <div id="general-list"></div>
+          </section>
+        </aside>
+      </section>
+
+      <footer>
+        <button id="about-button" class="text-button" type="button">玩法與素材</button>
+        <span>Playgrounds · Sampot</span>
+      </footer>
+    </main>
+
+    <section id="report-sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="report-title">
+      <div class="sheet-card battle-sheet">
+        <p class="kicker">羽檄星馳</p>
+        <h2 id="report-title">本回合戰報</h2>
+        <div id="report-content"></div>
+        <button id="report-close" class="primary big" type="button">整軍再議</button>
+      </div>
+    </section>
+
+    <section id="end-sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <div class="sheet-card end-card">
+        <div id="end-seal" class="end-seal" aria-hidden="true">勝</div>
+        <p id="end-kicker" class="kicker"></p>
+        <h2 id="end-title"></h2>
+        <p id="end-message"></p>
+        <div id="end-stats" class="report-stats"></div>
+        <button id="again-button" class="primary big" type="button">再領軍令</button>
+      </div>
+    </section>
+
+    <section id="about-sheet" class="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="about-title">
+      <div class="sheet-card rules-card">
+        <h2 id="about-title">軍略速查</h2>
+        <ol>
+          <li>每回合可下三道政令；點我方城市，再選政令。</li>
+          <li>移軍、出征都耗糧。每回合各城也需補給；糧道斷絕會先降士氣，低士氣再逃兵。</li>
+          <li>戰力由兵力、士氣、城牆與將領決定，另有小幅可重現的戰場波動。</li>
+          <li>攻城需十二回合內奪成都；守郡需讓漢中存續至第十二回合結束。</li>
+        </ol>
+        <p>第三方素材詳見 <a href="./ATTRIBUTION.md">ATTRIBUTION.md</a>。</p>
+        <button id="about-close" class="primary big" type="button">明白</button>
+      </div>
+    </section>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
