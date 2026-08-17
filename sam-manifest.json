@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "rev": "e4815fa",
+  "files": [
+    "app.js",
+    "assets/audio/battle.ogg",
+    "assets/audio/click.ogg",
+    "assets/audio/drum.ogg",
+    "assets/audio/victory.ogg",
+    "assets/audio/war-camp-loop.ogg",
+    "assets/fonts/Cubic_11.woff2",
+    "assets/images/terrain.png",
+    "assets/images/tower.png",
+    "assets/licenses/blippy-bits.txt",
+    "assets/licenses/cubic-11-ofl.txt",
+    "assets/licenses/kenney-rpg-audio.txt",
+    "assets/licenses/kenney-tower-defense-kit.txt",
+    "assets/licenses/kenney-ui-audio.txt",
+    "audio.js",
+    "functions.js",
+    "game.js",
+    "index.html",
+    "persist.js",
+    "styles.css"
+  ]
+}
